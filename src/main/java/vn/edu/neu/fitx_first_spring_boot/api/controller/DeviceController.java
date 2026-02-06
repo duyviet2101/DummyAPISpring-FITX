@@ -1,11 +1,15 @@
 package vn.edu.neu.fitx_first_spring_boot.api.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.neu.fitx_first_spring_boot.api.dto.in.DeviceDtoIn;
 import vn.edu.neu.fitx_first_spring_boot.api.entity.Device;
 import vn.edu.neu.fitx_first_spring_boot.api.service.DeviceService;
+import vn.edu.neu.fitx_first_spring_boot.common.response.ApiResponse;
 
-import java.util.List;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/devices")  //=> GET /devices/10
@@ -17,27 +21,33 @@ public class DeviceController {
     }
 
     @GetMapping
-    public List<Device> getAllDevices() {
-        return deviceService.getAllDevices();
+    public ResponseEntity<?> getAllDevices() {
+        return ResponseEntity.ok(ApiResponse.success(deviceService.getAllDevices()));
     }
 
     @GetMapping("/{id}")
-    public Device getDeviceById(@PathVariable Long id) {
-        return deviceService.getDeviceById(id);
+    public ResponseEntity<?> getDeviceById(@PathVariable Long id) {
+        Device device = deviceService.getDeviceById(id);
+        if (device != null) {
+            return ResponseEntity.ok(ApiResponse.success(device));
+        } else {
+            return ResponseEntity.status(404).body(ApiResponse.error(404, org.springframework.http.HttpStatus.NOT_FOUND, "Device not found"));
+        }
     }
 
     @PostMapping
-    public Device createDevice(@RequestBody Device device) {
-        return deviceService.createDevice(device);
+    public ResponseEntity<?> createDevice(@RequestBody @Valid DeviceDtoIn device) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(deviceService.createDevice(device)));
     }
 
     @PutMapping("/{id}")
-    public Device updateDevice(@PathVariable Long id, @RequestBody Device device) {
-        return deviceService.updateDevice(id, device);
+    public ResponseEntity<?> updateDevice(@PathVariable Long id, @RequestBody Device device) {
+        return ResponseEntity.ok(ApiResponse.success(deviceService.updateDevice(id, device)));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteDevice(@PathVariable Long id) {
+    public ResponseEntity<?> deleteDevice(@PathVariable Long id) {
         deviceService.deleteDevice(id);
+        return ResponseEntity.ok(ApiResponse.success(new HashMap<>()));
     }
 }

@@ -1,6 +1,7 @@
 package vn.edu.neu.fitx_first_spring_boot.api.service;
 
 import org.springframework.stereotype.Service;
+import vn.edu.neu.fitx_first_spring_boot.api.dto.in.DeviceDtoIn;
 import vn.edu.neu.fitx_first_spring_boot.api.entity.Device;
 
 import java.util.*;
@@ -19,11 +20,11 @@ public class DeviceService {
         return devices.get(id);
     }
 
-    public Device createDevice(Device device) {
+    public Device createDevice(DeviceDtoIn dto) {
         Long id = idGenerator.getAndIncrement();
-        device.setId(id);
-        devices.put(id, device);
-        return device;
+        Device newDevice = new Device(id, dto.getName(), dto.getManufacture());
+        devices.put(id, newDevice);
+        return newDevice;
     }
 
     public Device updateDevice(Long id, Device device) {
