@@ -12,10 +12,10 @@ import vn.edu.neu.fitx_first_spring_boot.common.response.ApiResponse;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/devices")  //=> GET /devices/10
+@RequestMapping("/devices")
 public class DeviceController {
     private final DeviceService deviceService;
-    
+
     public DeviceController(DeviceService deviceService) {
         this.deviceService = deviceService;
     }
@@ -26,12 +26,12 @@ public class DeviceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getDeviceById(@PathVariable Long id) {
+    public ResponseEntity<?> getDeviceById(@PathVariable String id) {
         Device device = deviceService.getDeviceById(id);
         if (device != null) {
             return ResponseEntity.ok(ApiResponse.success(device));
         } else {
-            return ResponseEntity.status(404).body(ApiResponse.error(404, org.springframework.http.HttpStatus.NOT_FOUND, "Device not found"));
+            return ResponseEntity.status(404).body(ApiResponse.error(404, HttpStatus.NOT_FOUND, "Device not found"));
         }
     }
 
@@ -41,12 +41,12 @@ public class DeviceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDevice(@PathVariable Long id, @RequestBody Device device) {
+    public ResponseEntity<?> updateDevice(@PathVariable String id, @RequestBody Device device) {
         return ResponseEntity.ok(ApiResponse.success(deviceService.updateDevice(id, device)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDevice(@PathVariable Long id) {
+    public ResponseEntity<?> deleteDevice(@PathVariable String id) {
         deviceService.deleteDevice(id);
         return ResponseEntity.ok(ApiResponse.success(new HashMap<>()));
     }
