@@ -3,38 +3,44 @@ package vn.edu.neu.fitx_first_spring_boot.api.service;
 import org.springframework.stereotype.Service;
 import vn.edu.neu.fitx_first_spring_boot.api.dto.in.DeviceDtoIn;
 import vn.edu.neu.fitx_first_spring_boot.api.entity.Device;
+import vn.edu.neu.fitx_first_spring_boot.api.repository.DeviceRepository;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DeviceService {
-    private final Map<Long, Device> devices = new HashMap<>();
-    private final AtomicLong idGenerator = new AtomicLong(1);
+    private final DeviceRepository deviceRepository;
+
+    public DeviceService(DeviceRepository deviceRepository) {
+        this.deviceRepository = deviceRepository;
+    }
 
     public List<Device> getAllDevices() {
-        return new ArrayList<>(devices.values());
+        return deviceRepository.findAll();
     }
 
     public Device getDeviceById(Long id) {
-        return devices.get(id);
+        return deviceRepository.findById(id).orElse(null);
     }
 
     public Device createDevice(DeviceDtoIn dto) {
-        Long id = idGenerator.getAndIncrement();
-        Device newDevice = new Device(id, dto.getName(), dto.getManufacture());
-        devices.put(id, newDevice);
-        return newDevice;
+        Device newDevice = new Device(null, dto.getName(), dto.getManufacture());
+        return deviceRepository.save(newDevice);
     }
 
-    public Device updateDevice(Long id, Device device) {
-        if (!devices.containsKey(id)) return null;
-        device.setId(id);
-        devices.put(id, device);
-        return device;
+    public Device updateDevice(Long id, DeviceDtoIn dto) {
+        Optional<Device> existing = deviceRepository.findById(id);
+        if (existing.isEmpty()) return null;
+        Device device = existing.get();
+        device.setName(dto.getName());
+        device.setManufacture(dto.getManufacture());
+        return deviceRepository.save(device);
     }
 
     public boolean deleteDevice(Long id) {
-        return devices.remove(id) != null;
+        if (!deviceRepository.existsById(id)) return false;
+        deviceRepository.deleteById(id);
+        return true;
     }
 }
