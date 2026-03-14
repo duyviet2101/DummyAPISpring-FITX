@@ -9,7 +9,7 @@ import vn.edu.neu.fitx_first_spring_boot.api.entity.Device;
 import vn.edu.neu.fitx_first_spring_boot.api.service.DeviceService;
 import vn.edu.neu.fitx_first_spring_boot.common.response.ApiResponse;
 
-import java.util.HashMap;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/devices")  //=> GET /devices/10
@@ -41,13 +41,17 @@ public class DeviceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDevice(@PathVariable Long id, @RequestBody Device device) {
-        return ResponseEntity.ok(ApiResponse.success(deviceService.updateDevice(id, device)));
+    public ResponseEntity<?> updateDevice(@PathVariable Long id, @RequestBody @Valid DeviceDtoIn device) {
+        Device updated = deviceService.updateDevice(id, device);
+        if (updated == null) {
+            return ResponseEntity.status(404).body(ApiResponse.error(404, org.springframework.http.HttpStatus.NOT_FOUND, "Device not found"));
+        }
+        return ResponseEntity.ok(ApiResponse.success(updated));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDevice(@PathVariable Long id) {
         deviceService.deleteDevice(id);
-        return ResponseEntity.ok(ApiResponse.success(new HashMap<>()));
+        return ResponseEntity.ok(ApiResponse.success(Collections.emptyMap()));
     }
 }
